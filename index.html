@@ -3,42 +3,18 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=bWNirr8ebCVOwDRlaZlyYF9hI63rIGAm"></script>
     <script type="text/javascript">
 
+
       // 将地址解析结果显示在地图上,并调整地图视野
-      function parseAddress(mStartL,mStartC,mEndL,mEndC){
-        myGeo.getPoint(mStartL, function(pstart){
-          if (pstart) {
-            startPoint = pstart;
-            if(startPoint && endPoint) {
-              run(startPoint,endPoint,map);
-            }
-          }else{
-            alert("起始地址没有解析到结果!");
-          }
-        }, mStartC);
 
-        myGeo.getPoint(mEndL, function(pend){
-          if (pend) {
-            endPoint = pend;
-            if(startPoint && endPoint) {
-              run(startPoint,endPoint,map);
-            }
-          }else{
-            alert("终点地址没有解析到结果!");
-          }
-        }, mEndC);
-      }
-
-      function onExportData(){
-        alert(JSON.stringify(mapPointArray));
-      }
 
     </script>
     <title>地图路径规划</title>
   </head>
   <body>
-    <div id="app" style="padding: 0; margin: 0;"></div>
+    <div id="app" style="padding: 0; margin: 0; height: 100%; width: 100%;"></div>
     <!-- built files will be auto injected -->
   </body>
 </html>
