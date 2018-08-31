@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="top-div">
+    <div ref="topdivref" class="top-div">
       <label>起始地点：</label>
       <input type="text" id="start-location" placeholder="请输入起始地点"/>
       <input type="text"
@@ -14,7 +14,9 @@
       <input type="button" value="点击搜索" @click="onSearch()"/>
       <input type="button" value="输出数据" @click="onExportData()"/>
     </div>
-    <div class="map-div" id="allmap" :style="onMapLayout"></div>
+    <div style="display: flex; flex: 1;">
+      <div class="map-div" id="allmap"></div>
+    </div>
   </div>
 </template>
 <script>
@@ -112,16 +114,17 @@ export default {
 
   },
   created () {
-    this.creatMap()
   },
   mounted () {
-
+    this.creatMap()
   },
   computed: {
     onMapLayout () {
+      // let topHeight = this.refs.top-div.width
+      console.log(JSON.stringify(this.$refs['topdivref']))
       let wid = window.innerWidth
       let hei = window.innerHeight
-      return `height: ${hei - 200}px; width: ${wid}px`
+      return `height: ${hei}px; width: ${wid}px; paddingTop: 10px;`
     }
   }
 }
@@ -139,8 +142,8 @@ export default {
     font-family: "微软雅黑";
   }
   .map-div {
-    height: 100%;
     width: 100%;
+    height: 100%;
   }
   .top-div {
 
