@@ -43,13 +43,14 @@ export default {
       this.map = map
     },
     runMap (startPoint, endPoint, map) {
+      let _that = this
       map.centerAndZoom(new BMap.Point(Math.abs((startPoint.lng + endPoint.lng) / 2), Math.abs((startPoint.lat + endPoint.lat) / 2)), 12)
       let driving = new BMap.DrivingRoute(map) // 驾车实例
       driving.search(startPoint, endPoint)
       driving.setSearchCompleteCallback(function () {
         let pts = driving.getResults().getPlan(0).getRoute(0).getPath() // 通过驾车实例，获得一系列点的数组
         setTimeout(function () {
-          this.resetMkPoint(pts)
+          _that.resetMkPoint(pts)
         }, 100)
       })
     },
@@ -74,23 +75,21 @@ export default {
       this.mapPointArray.push(point)
     },
     resetMkPoint (pts) {
-      let i = 0
-      let paths = pts.length // 获得有几个点
-      let po = new BMap.Point(pts[i].lng, pts[i].lat)
-      this.addMarker(po)
-      if (i < paths) {
-        i++
-        this.resetMkPoint(i)
+      let leng = pts.length // 获得有几个点
+      for (let i = 0; i < leng; i++) {
+        let po = new BMap.Point(pts[i].lng, pts[i].lat)
+        this.addMarker(po)
       }
     },
     parseAddress (mStartL, mStartC, mEndL, mEndC) {
       // 创建地址解析器实例
       let myGeo = new BMap.Geocoder()
+      let _that = this
       myGeo.getPoint(mStartL, function (pstart) {
         if (pstart) {
-          this.startPoint = pstart
-          if (this.startPoint && this.endPoint) {
-            this.runMap(this.startPoint, this.endPoint, this.map)
+          _that.startPoint = pstart
+          if (_that.startPoint && _that.endPoint) {
+            _that.runMap(_that.startPoint, _that.endPoint, _that.map)
           }
         } else {
           alert('起始地址没有解析到结果!')
@@ -99,9 +98,9 @@ export default {
 
       myGeo.getPoint(mEndL, function (pend) {
         if (pend) {
-          this.endPoint = pend
-          if (this.startPoint && this.endPoint) {
-            this.runMap(this.startPoint, this.endPoint, this.map)
+          _that.endPoint = pend
+          if (_that.startPoint && _that.endPoint) {
+            _that.runMap(_that.startPoint, _that.endPoint, _that.map)
           }
         } else {
           alert('终点地址没有解析到结果!')
@@ -119,13 +118,6 @@ export default {
     this.creatMap()
   },
   computed: {
-    onMapLayout () {
-      // let topHeight = this.refs.top-div.width
-      console.log(JSON.stringify(this.$refs['topdivref']))
-      let wid = window.innerWidth
-      let hei = window.innerHeight
-      return `height: ${hei}px; width: ${wid}px; paddingTop: 10px;`
-    }
   }
 }
 </script>
