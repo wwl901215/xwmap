@@ -47,8 +47,17 @@ export default {
       map.centerAndZoom(new BMap.Point(Math.abs((startPoint.lng + endPoint.lng) / 2), Math.abs((startPoint.lat + endPoint.lat) / 2)), 12)
       let driving = new BMap.DrivingRoute(map) // 驾车实例
       driving.search(startPoint, endPoint)
+      driving.getResults()// 检索最近一次搜索结果 返回DrivingRouteResult
+      driving.clearResults() // 清除最近一次检索的结果
+      // driving.setPolicy(policy:DrivingPolicy) // 设置路线规划策略，参数为策略常量
       driving.setSearchCompleteCallback(function () {
         let pts = driving.getResults().getPlan(0).getRoute(0).getPath() // 通过驾车实例，获得一系列点的数组
+        let plansNum = driving.getResults().getNumPlans() // Number 表示驾车几种方案，每种方案中有多条路线；
+        let plans = driving.getResults().getPlan(0) // 表示第一条方法；
+        let routeNum = plans.getNumRoutes() // 表示每条方案中的路线数量；
+        let route = plans.getRoute(0) // 表示获取第一条路线；
+        let poly = route.getPolyline() // 仅当结果自动添加到地图上有效，拐点图标信息
+        // let des = route.getPath()
         setTimeout(function () {
           _that.resetMkPoint(pts)
         }, 100)
@@ -71,6 +80,9 @@ export default {
     },
     addMarker (point) {
       let marker = new BMap.Marker(point)
+      /**
+       * 该方法是在地图上绘制图标，如果路径太远会导致页面卡死，可去掉该绘点功能；
+       */
       this.map.addOverlay(marker)
       this.mapPointArray.push(point)
     },
