@@ -50,18 +50,67 @@ export default {
       driving.getResults()// 检索最近一次搜索结果 返回DrivingRouteResult
       driving.clearResults() // 清除最近一次检索的结果
       // driving.setPolicy(policy:DrivingPolicy) // 设置路线规划策略，参数为策略常量
+      driving.setPolylinesSetCallback(function (event) {
+        alert(JSON.stringify(event))
+      })
       driving.setSearchCompleteCallback(function () {
         let pts = driving.getResults().getPlan(0).getRoute(0).getPath() // 通过驾车实例，获得一系列点的数组
         let plansNum = driving.getResults().getNumPlans() // Number 表示驾车几种方案，每种方案中有多条路线；
         let plans = driving.getResults().getPlan(0) // 表示第一条方法；
         let routeNum = plans.getNumRoutes() // 表示每条方案中的路线数量；
+        console.log('plan-distance:' + plans.getDistance())
+        console.log('plan-dragpois:' + plans.getDragPois())
+        console.log('plan-duration:' + plans.getDuration())
         let route = plans.getRoute(0) // 表示获取第一条路线；
-        let poly = route.getPolyline() // 仅当结果自动添加到地图上有效，拐点图标信息
+        console.log('route-distance:' + route.getDistance(0))
+        console.log('route-index:' + route.getIndex())
+        console.log('route-numsteps:' + route.getNumSteps())
+        console.log('route-polyline:' + route.getPolyline())
+        console.log('route-routeType:' + route.getRouteType())
+        console.log('route-step:' + route.getStep(1))
+        console.log('route-distance:' + route.getDistance())
+        let stepNums = route.getNumSteps()
+        for (let i = 0; i < stepNums; i++) {
+          let step = route.getStep(i)
+          // console.log('step-distance:' + step.getDistance(true))
+          console.log('step-description:' + step.getDescription(true)) // 描述信息中是否带html信息
+          // console.log('step-index:' + step.getIndex())
+          // console.log('step-position.lat:' + step.getPosition().lat)
+          let start = `<span class="navtrans-navlist-icon "></span><div class='navtrans-navlist-content'>从起点向正西方向出发</div>`
+          let dec = `<span class="navtrans-navlist-icon s-1"></span><div class='navtrans-navlist-content'>行驶90米，到达终点</div>`
+          let dec2 = `<span class="navtrans-navlist-icon s-2"></span><div class='navtrans-navlist-content'>沿同成街行驶340米，右前方转弯进入<span>G6辅路</span></div>`
+          _that.dealString(step.getDescription())
+        }
+        // console.log('route-path:' + route.getPath())
+        // let poly = route.getPolyline() // 仅当结果自动添加到地图上有效，拐点图标信息
         // let des = route.getPath()
-        setTimeout(function () {
-          _that.resetMkPoint(pts)
-        }, 100)
+        _that.resetMkPoint(pts)
       })
+    },
+    /**
+     * 解析字符串
+     */
+    dealString (dataString) {
+      let iconTypeReg = /(?<=<span class="navtrans-navlist-icon ).*?(?="><\/span>)/
+      let nextRouteReg = /(?<=<span>).*?(?=<\/span>)/
+      let iconType = dataString.match(iconTypeReg) || []
+      let nextRoute = dataString.match(nextRouteReg) || []
+      let dirReg = ''
+      if (nextRoute) {
+        dirReg = /(?<=米，).*?(?=进入<span>)/
+      } else {
+        dirReg = /(?<=，).*?(?=<\/div>)/
+      }
+      let dirString = dataString.match(dirReg) || []
+      let
+      console.log(iconType[0] + '<--->' + dirString[0])
+      let resul = {
+        stepType: '',
+        iconType: ''
+
+      }
+
+      return resul
     },
     onSearch () {
       let startLocation = document.getElementById('start-location').value
@@ -81,17 +130,43 @@ export default {
     addMarker (point) {
       let marker = new BMap.Marker(point)
       /**
-       * 该方法是在地图上绘制图标，如果路径太远会导致页面卡死，可去掉该绘点功能；
-       */
-      this.map.addOverlay(marker)
+         * 该方法是在地图上绘制图标，如果路径太远会导致页面卡死，可去掉该绘点功能；
+         */
+      // this.map.addOverlay(marker)
       this.mapPointArray.push(point)
     },
+    /**
+     *该方法用来画点或者线
+     * @param point
+     */
     resetMkPoint (pts) {
       let leng = pts.length // 获得有几个点
       for (let i = 0; i < leng; i++) {
         let po = new BMap.Point(pts[i].lng, pts[i].lat)
+        this.mapLine(pts, i)
         this.addMarker(po)
       }
+    },
+    /**
+     * this method is used to draw line;
+     * @param pts
+     * @param i
+     */
+    mapLine (pts, i = 0) {
+      if (!pts || !pts[i] || !pts[i + 1] || !pts[i].lng || !pts[i].lat || !pts[i + 1].lng || !pts[i + 1].lat) return
+      let sP = pts[i]
+      let eP = pts[i + 1]
+      let polyline = new BMap.Polyline(
+        [
+          sP,
+          eP
+        ],
+        {
+          strokeColor: 'red',
+          strokeWeight: 7,
+          strokeOpacity: 1
+        }) // 创建折线
+      this.map.addOverlay(polyline)
     },
     parseAddress (mStartL, mStartC, mEndL, mEndC) {
       // 创建地址解析器实例
@@ -129,8 +204,7 @@ export default {
   mounted () {
     this.creatMap()
   },
-  computed: {
-  }
+  computed: {}
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -145,10 +219,12 @@ export default {
     margin: 0;
     font-family: "微软雅黑";
   }
+
   .map-div {
     width: 100%;
     height: 100%;
   }
+
   .top-div {
 
   }
