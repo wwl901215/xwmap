@@ -27,6 +27,7 @@ export default {
   data () {
     return {
       mapPointArray: [],
+      mapStepArray: [],
       map: null,
       startPoint: null,
       endPoint: null,
@@ -73,13 +74,14 @@ export default {
         for (let i = 0; i < stepNums; i++) {
           let step = route.getStep(i)
           // console.log('step-distance:' + step.getDistance(true))
-          console.log('step-description:' + step.getDescription(true)) // 描述信息中是否带html信息
+          // console.log('step-description:' + step.getDescription(true)) // 描述信息中是否带html信息
           // console.log('step-index:' + step.getIndex())
           // console.log('step-position.lat:' + step.getPosition().lat)
           let start = `<span class="navtrans-navlist-icon "></span><div class='navtrans-navlist-content'>从起点向正西方向出发</div>`
           let dec = `<span class="navtrans-navlist-icon s-1"></span><div class='navtrans-navlist-content'>行驶90米，到达终点</div>`
           let dec2 = `<span class="navtrans-navlist-icon s-2"></span><div class='navtrans-navlist-content'>沿同成街行驶340米，右前方转弯进入<span>G6辅路</span></div>`
           _that.dealString(step.getDescription())
+          _that.mapStepArray.push(step.getPosition())
         }
         // console.log('route-path:' + route.getPath())
         // let poly = route.getPolyline() // 仅当结果自动添加到地图上有效，拐点图标信息
@@ -102,14 +104,13 @@ export default {
         dirReg = /(?<=，).*?(?=<\/div>)/
       }
       let dirString = dataString.match(dirReg) || []
-      let
-      console.log(iconType[0] + '<--->' + dirString[0])
+      let tempReg = /(?<=<div class='navtrans-navlist-content'>).*?(?=<\/div>)/
+      let tempString = dataString.match(tempReg) || []
+      console.log(iconType[0] + '<--->' + tempString[0])
       let resul = {
         stepType: '',
         iconType: ''
-
       }
-
       return resul
     },
     onSearch () {
@@ -195,6 +196,22 @@ export default {
       }, mEndC)
     },
     onExportData () {
+      let allPoint = this.mapPointArray
+      let stepPoint = this.mapStepArray
+      console.log('allPoint-length:' + allPoint.length)
+      console.log('stepPoint-length:' + stepPoint.length)
+      let k = 0
+      for (let i = 0; i < allPoint.length; i++) {
+        console.log('allData:' + i)
+        let allItem = allPoint[i]
+        for (let j = 0; j < stepPoint.length; j++) {
+          let stepItem = stepPoint[j]
+          if (allItem.lat === stepItem.lat && allItem.lng === stepItem.lng) {
+            k++
+            console.log(k)
+          }
+        }
+      }
       alert(JSON.stringify(this.mapPointArray))
     }
 
