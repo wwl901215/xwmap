@@ -14,13 +14,18 @@
       <input type="button" value="点击搜索" @click="onSearch()"/>
       <input type="button" value="输出数据" @click="onExportData()"/>
     </div>
+    <span>{{tempData.name}}</span>
+    <span>{{tempData.age}}</span>
+    <span>{{tempData.sex}}</span>
     <div style="display: flex; flex: 1;">
       <div class="map-div" id="allmap"></div>
     </div>
+    <textarea style="width: 100%; height: 50px;"></textarea>
   </div>
 </template>
 <script>
 import BMap from 'BMap'
+import tempData from './tempData'
 
 export default {
   name: 'HelloWorld',
@@ -31,7 +36,8 @@ export default {
       map: null,
       startPoint: null,
       endPoint: null,
-      myGeo: null
+      myGeo: null,
+      tempData: tempData
     }
   },
   components: {},
@@ -56,9 +62,9 @@ export default {
       })
       driving.setSearchCompleteCallback(function () {
         let pts = driving.getResults().getPlan(0).getRoute(0).getPath() // 通过驾车实例，获得一系列点的数组
-        let plansNum = driving.getResults().getNumPlans() // Number 表示驾车几种方案，每种方案中有多条路线；
+        // let plansNum = driving.getResults().getNumPlans() // Number 表示驾车几种方案，每种方案中有多条路线；
         let plans = driving.getResults().getPlan(0) // 表示第一条方法；
-        let routeNum = plans.getNumRoutes() // 表示每条方案中的路线数量；
+        // let routeNum = plans.getNumRoutes() // 表示每条方案中的路线数量；
         console.log('plan-distance:' + plans.getDistance())
         console.log('plan-dragpois:' + plans.getDragPois())
         console.log('plan-duration:' + plans.getDuration())
@@ -77,9 +83,9 @@ export default {
           // console.log('step-description:' + step.getDescription(true)) // 描述信息中是否带html信息
           // console.log('step-index:' + step.getIndex())
           // console.log('step-position.lat:' + step.getPosition().lat)
-          let start = `<span class="navtrans-navlist-icon "></span><div class='navtrans-navlist-content'>从起点向正西方向出发</div>`
-          let dec = `<span class="navtrans-navlist-icon s-1"></span><div class='navtrans-navlist-content'>行驶90米，到达终点</div>`
-          let dec2 = `<span class="navtrans-navlist-icon s-2"></span><div class='navtrans-navlist-content'>沿同成街行驶340米，右前方转弯进入<span>G6辅路</span></div>`
+          // let start = `<span class="navtrans-navlist-icon "></span><div class='navtrans-navlist-content'>从起点向正西方向出发</div>`
+          // let dec = `<span class="navtrans-navlist-icon s-1"></span><div class='navtrans-navlist-content'>行驶90米，到达终点</div>`
+          // let dec2 = `<span class="navtrans-navlist-icon s-2"></span><div class='navtrans-navlist-content'>沿同成街行驶340米，右前方转弯进入<span>G6辅路</span></div>`
           _that.dealString(step.getDescription())
           _that.mapStepArray.push(step.getPosition())
         }
@@ -94,16 +100,16 @@ export default {
      */
     dealString (dataString) {
       let iconTypeReg = /(?<=<span class="navtrans-navlist-icon ).*?(?="><\/span>)/
-      let nextRouteReg = /(?<=<span>).*?(?=<\/span>)/
+      // let nextRouteReg = /(?<=<span>).*?(?=<\/span>)/
       let iconType = dataString.match(iconTypeReg) || []
-      let nextRoute = dataString.match(nextRouteReg) || []
-      let dirReg = ''
-      if (nextRoute) {
-        dirReg = /(?<=米，).*?(?=进入<span>)/
-      } else {
-        dirReg = /(?<=，).*?(?=<\/div>)/
-      }
-      let dirString = dataString.match(dirReg) || []
+      // let nextRoute = dataString.match(nextRouteReg) || []
+      // let dirReg = ''
+      // if (nextRoute) {
+      //   dirReg = /(?<=米，).*?(?=进入<span>)/
+      // } else {
+      //   dirReg = /(?<=，).*?(?=<\/div>)/
+      // }
+      // let dirString = dataString.match(dirReg) || []
       let tempReg = /(?<=<div class='navtrans-navlist-content'>).*?(?=<\/div>)/
       let tempString = dataString.match(tempReg) || []
       console.log(iconType[0] + '<--->' + tempString[0])
@@ -129,7 +135,7 @@ export default {
       }
     },
     addMarker (point) {
-      let marker = new BMap.Marker(point)
+      // let marker = new BMap.Marker(point)
       /**
          * 该方法是在地图上绘制图标，如果路径太远会导致页面卡死，可去掉该绘点功能；
          */
@@ -220,6 +226,9 @@ export default {
   },
   mounted () {
     this.creatMap()
+    // let dataString = 'lsmdlkfceo/未知未知未知未知@lskjdlkf'
+    // let iconTypeReg = /(?<=\/).*?(?=@)/
+    // let iconType = dataString.match(iconTypeReg)
   },
   computed: {}
 }
