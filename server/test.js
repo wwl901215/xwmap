@@ -9,3 +9,4 @@ var server=http.createServer(function(req,res){
   res.end();
 }).listen(8880);
 console.log('服务器开启成功');
+console.log('服务器开启成功');
